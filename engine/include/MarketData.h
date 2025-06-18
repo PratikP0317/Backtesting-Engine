@@ -12,18 +12,31 @@ public:
 
   int size() const { return static_cast<int>(bars_.size());}
   bool isEmpty() const { return bars_.empty(); }
-  void clear() { bars_.clear();  current_index_ = 0; }
+  void clear() { bars_.clear();  currentIndex_ = 0; }
 
   const Bar &get(int index) const;
+  int getCurrentIndex() const { return currentIndex_; }
   const Bar &getFirst() const;
   const Bar &getLast() const;
-  const Bar &getCurrent() const;
-
   const std::vector<Bar> &getAll() const {return bars_;}
 
-  // Peek at current bar without advancing
-  const Bar& current() const;
+  const Bar &current() const;
+  bool next();
+  bool prev();
+  bool reset();
+  bool setCurrentIndex(int index);
+
+  bool isLast() const;
+
+  std::vector<Bar> getRange(int start, int end) const;
+  int findIndexByTimestamp(const std::string& timestamp) const;
+  std::vector<Bar> getBetweenTimestamps(const std::string& start, const std::string& end) const;
+
+  bool move(int offset);
+
 private:
   std::vector<Bar> bars_;
-  int current_index_ = 0;
+  int currentIndex_ = 0;
+
+  bool isValidIndex(int index) const;
 };

@@ -59,23 +59,108 @@ bool MarketData::loadFromCSV(const std::string &filepath) {
   return true;
 }
 
+bool MarketData::isValidIndex(int index) const {
+  return index >= 0 && index < static_cast<int>(bars_.size());
+}
+
 const Bar& MarketData::get(int index) const {
-  if (index < 0 || index >= static_cast<int>(bars_.size())) {
+  if (!isValidIndex(index)) {
     throw std::out_of_range("Index out of range in MarketData::get");
   }
   return bars_[index];
 }
 
 const Bar& MarketData::getFirst() const {
-  if (bars_.empty()) {
+  if (isEmpty()) {
     throw std::out_of_range("No bars available in MarketData::getFirst");
   }
   return bars_.front();
 }
 
 const Bar& MarketData::getLast() const {
-  if (bars_.empty()) {
+  if (isEmpty()) {
     throw std::out_of_range("No bars available in MarketData::getLast");
   }
   return bars_.back();
+}
+
+const Bar& MarketData::current() const {
+  if (isEmpty()) {
+    throw std::out_of_range("No bars available in MarketData::current");
+  }
+  if (!isValidIndex(currentIndex_)) {
+    throw std::out_of_range("currentIndex_ out of range in MarketData::current");
+  }
+  return bars_[currentIndex_];
+}
+
+bool MarketData::next() {
+  if (isValidIndex(currentIndex_ + 1)) {
+    currentIndex_++;
+    return true;
+  }
+  return false;
+}
+
+bool MarketData::prev() {
+  if (isValidIndex(currentIndex_ - 1)) {
+    currentIndex_--;
+    return true;
+  }
+  return false;
+}
+
+bool MarketData::reset() {
+  if (isValidIndex(currentIndex_)) {
+    currentIndex_ = 0;
+    return true;
+  }
+  return false;
+}
+
+bool MarketData::setCurrentIndex(int index) {
+  if (isValidIndex(index)) {
+    currentIndex_ = index;
+    return true;
+  }
+  return false;
+}
+
+bool MarketData::isLast() const {
+  return !isValidIndex(currentIndex_ + 1);
+}
+
+std::vector<Bar> MarketData::getRange(int start, int end) const {
+  if (!isValidIndex(start) || !isValidIndex(end) || start > end) {
+    return {};
+  }
+  return std::vector<Bar>(bars_.begin() + start, bars_.begin() + end + 1);
+}
+
+int MarketData::findIndexByTimestamp(const std::string& timestamp) const {
+  for (size_t i = 0; i < bars_.size(); ++i) {
+    if (bars_[i].timestamp == timestamp) {
+      return static_cast<int>(i);
+    }
+  }
+  return -1;
+}
+
+std::vector<Bar> MarketData::getBetweenTimestamps(const std::string& start, const std::string& end) const {
+  if (isValidIndex(findIndexByTimestamp(start)) &&
+      isValidIndex(findIndexByTimestamp(end))) {
+    int startIndex = findIndexByTimestamp(start);
+    int endIndex = findIndexByTimestamp(end);
+    return getRange(startIndex, endIndex);
+  }
+  return {};
+}
+
+bool MarketData::move(int offset) {
+  int newIndex = currentIndex_ + offset;
+  if (isValidIndex(newIndex)) {
+    currentIndex_ = newIndex;
+    return true;
+  }
+  return false;
 }
