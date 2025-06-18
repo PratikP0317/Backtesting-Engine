@@ -21,6 +21,7 @@ Makefile
 # Python interface (if added)
 __pycache__/
 *.pyc
+*env/
 .venv/
 .env
 
