@@ -1,0 +1,29 @@
+# C++
+build/
+*.o
+*.obj
+*.exe
+*.out
+*.a
+*.so
+*.log
+
+# macOS/Linux/Windows temp files
+.DS_Store
+Thumbs.db
+
+# CMake
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+Makefile
+
+# Python interface (if added)
+__pycache__/
+*.pyc
+.venv/
+.env
+
+# IDEs
+.vscode/
+.idea/
