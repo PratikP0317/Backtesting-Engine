@@ -1,7 +1,15 @@
+#pragma once
+
+#include <string>
+
 struct Bar {
-    double open;
-    double high;
-    double low;
-    double close;
-    long volume;
+  std::string symbol;
+  std::string timestamp;
+  double open;
+  double high;
+  double low;
+  double close;
+  long volume;
+  long tradeCount;
+  double vwap;
 };
