@@ -6,7 +6,7 @@ build/
 *.out
 *.a
 *.so
-*.log
+
 
 # macOS/Linux/Windows temp files
 .DS_Store

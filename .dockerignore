@@ -6,8 +6,6 @@
 
 # Ignore build directories
 engine/build/
-engine/logs/
-logs/
 output/
 
 # Ignore Python virtual environment
@@ -31,7 +29,6 @@ alpaca-env/
 # Ignore temporary files
 *.tmp
 *.temp
-*.log
 
 # Ignore compiled binaries (will be built in container)
 engine/backtesting-engine

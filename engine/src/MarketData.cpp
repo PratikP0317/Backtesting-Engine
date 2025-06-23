@@ -19,9 +19,10 @@ bool MarketData::loadFromCSV(const std::string &filepath) {
 
   std::string line;
   std::getline(file, line); // Skip header
-  Log::debug("Skipped CSV header line");
 
   int lineNumber = 1;
+  Log::info("Starting to parse CSV file: " + filepath);
+  Log::info("symbol,timestamp,open,high,low,close,volume,tradeCount,vwap");
   while (std::getline(file, line)) {
     lineNumber++;
     std::istringstream ss(line);
@@ -39,17 +40,15 @@ bool MarketData::loadFromCSV(const std::string &filepath) {
       std::getline(ss, token, ','); bar.tradeCount = std::stol(token);
       std::getline(ss, token, ','); bar.vwap = std::stod(token);
       //Log all the data loaded
-      Log::info("Loaded bar: " + bar.symbol + " at " + bar.timestamp + "\n" +
-           "Open: " + std::to_string(bar.open) + "\n" +
-           "High: " + std::to_string(bar.high) + "\n" +
-           "Low: " + std::to_string(bar.low) + "\n" +
-           "Close: " + std::to_string(bar.close) + "\n" +
-           "Volume: " + std::to_string(bar.volume) + "\n" +
-           "Trade Count: " + std::to_string(bar.tradeCount) + "\n" +
-           "VWAP: " + std::to_string(bar.vwap));
+
+      // Log loaded bar data
+      // Log::info(bar.symbol + "," + bar.timestamp + "," + std::to_string(bar.open) + "," + 
+      //           std::to_string(bar.high) + "," + std::to_string(bar.low) + "," + 
+      //           std::to_string(bar.close) + "," + std::to_string(bar.volume) + "," + 
+      //           std::to_string(bar.tradeCount) + "," + std::to_string(bar.vwap));
     } catch (const std::exception& e) {
       Log::warn("Failed to parse line " + std::to_string(lineNumber) + ": " + e.what());
-      continue;
+      return false;
     }
     bars_.push_back(bar);
   }

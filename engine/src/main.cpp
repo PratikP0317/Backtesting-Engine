@@ -5,8 +5,14 @@
 int main() {
   std::cout << "Market Data Application Started" << std::endl;
   MarketData md;
+  std::time_t t = std::time(0);
+  std::tm* now = std::localtime(&t);
+  char buffer[80];
+  std::strftime(buffer, sizeof(buffer), "%Y%m%d_%H%M%S", now);
+  std::string logFileName = "app_" + std::string(buffer) + ".log";
+  //Log::init(logFileName);
   Log::init("app.log");
-  if (!md.loadFromCSV("sample_data.csv")) {
+  if (!md.loadFromCSV("data/spy_minute.csv")) {
     Log::error("Failed to load sample data.");
     return 1;
   }

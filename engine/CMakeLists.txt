@@ -18,19 +18,11 @@ set(CMAKE_CXX_FLAGS_RELEASE "-O3 -DNDEBUG")
 # Include directories
 include_directories(include)
 
-# Source files
-set(SOURCES
-    src/main.cpp
-    src/MarketData.cpp
-    src/Log.cpp
-)
+# Source files - automatically find all .cpp files in src/
+file(GLOB SOURCES "src/*.cpp")
 
-# Header files (for IDE support)
-set(HEADERS
-    include/Bar.h
-    include/Log.h
-    include/MarketData.h
-)
+# Header files - automatically find all .h files in include/
+file(GLOB HEADERS "include/*.h")
 
 # Create executable
 add_executable(backtesting-engine ${SOURCES} ${HEADERS})

@@ -1,0 +1,26 @@
+services:
+  run:
+    build: .
+    image: backtesting-engine:latest
+    container_name: backtesting-engine
+    volumes:
+      - ./logs:/app/logs
+      - ./data:/app/data
+    environment:
+      - LOG_LEVEL=info
+    working_dir: /app
+    # command: ["./backtesting-engine"]
+    stdin_open: true    # Keep STDIN open (-i flag)
+    tty: true          # Allocate a pseudo-TTY (-t flag)
+
+  # Optional: Add a development service for interactive development
+  #dev:
+  #  build: .
+  #  container_name: backtesting-engine-dev
+  #  volumes:
+  #    - .:/app
+  #    - ./logs:/app/logs
+  #  working_dir: /app/engine
+  #  command: ["/bin/bash"]
+  #  stdin_open: true
+  #  tty: true

@@ -24,17 +24,13 @@ RUN mkdir -p build && cd build && \
     make -j$(nproc)
 
 # Create logs directory and copy executable
-RUN mkdir -p logs && \
-    cp build/bin/backtesting-engine .
+RUN cp build/bin/backtesting-engine  /app
 
-# Copy sample data if it exists
-RUN if [ -f ../data/spy_minute.csv ]; then \
-    cp ../data/spy_minute.csv sample_data.csv; \
-    else \
-    echo "timestamp,symbol,open,high,low,close,volume,trade_count,vwap" > sample_data.csv && \
-    echo "2025-06-13 12:23:00+00:00,SPY,100.0,101.0,99.0,100.5,1000,10,100.2" >> sample_data.csv && \
-    echo "2025-06-13 12:24:00+00:00,SPY,100.5,102.0,100.0,101.5,1200,12,101.0" >> sample_data.csv; \
-    fi
 
 # Default command - run the backtesting engine
-CMD ["./backtesting-engine"]
+#CMD ["./backtesting-engine"]
+# Run with -it
+#CMD [ "/bin/bash" ]
+CMD ["/bin/bash", "-c", "./backtesting-engine && exec bash"]
+
+
