@@ -10,7 +10,7 @@ int main() {
   std::strftime(buffer, sizeof(buffer), "%Y%m%d_%H%M%S", now);
   std::string logFileName = "app_" + std::string(buffer) + ".log";
   //Log::init(logFileName);
-  Log::init("app.log");
+  Log::init("app.log", true);
 
   BacktestEngine engine(100'000.0);
   if (!engine.loadData("data/spy_minute.csv")) {

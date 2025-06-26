@@ -6,7 +6,7 @@
 
 class Log {
 public:
-    static void init(const std::string& filename);
+    static void init(const std::string& filename, bool verbose = false);
     static void close();
 
     static void debug(const std::string& msg);
@@ -18,6 +18,7 @@ private:
     static std::ofstream log_file_;
     static bool file_logging_enabled_;
     static std::mutex log_mutex_;
+    static bool verbose_;
 
     static std::string timestamp();
 };

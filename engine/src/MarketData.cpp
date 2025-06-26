@@ -3,10 +3,19 @@
 #include <stdexcept>  
 #include <string>
 #include <vector>
-
+#include <algorithm>
 
 #include "MarketData.h"
 #include "Log.h"
+
+MarketData::MarketData() : currentIter_(bars_.cend()) {
+}
+
+MarketData::MarketData(const std::string &csvFilePath) : currentIter_(bars_.cend()) {
+  if (!loadFromCSV(csvFilePath)) {
+    throw std::runtime_error("Failed to load CSV file: " + csvFilePath);
+  }
+}
 
 
 bool MarketData::loadFromCSV(const std::string &filepath) {
@@ -51,115 +60,129 @@ bool MarketData::loadFromCSV(const std::string &filepath) {
       return false;
     }
     bars_.push_back(bar);
-  }
-
-  Log::info("Successfully loaded " + std::to_string(bars_.size()) + " bars from " + filepath);
+  }  Log::info("Successfully loaded " + std::to_string(bars_.size()) + " bars from " + filepath);
   file.close();
+  if (!bars_.empty()) {
+    currentIter_ = bars_.cbegin();  // Reset to first bar
+  }
   return true;
 }
 
-bool MarketData::isValidIndex(int index) const {
-  return index >= 0 && index < static_cast<int>(bars_.size());
+int MarketData::size() const {
+  return static_cast<int>(bars_.size());
 }
 
-const Bar& MarketData::get(int index) const {
-  if (!isValidIndex(index)) {
-    throw std::out_of_range("Index out of range in MarketData::get");
-  }
-  return bars_[index];
+bool MarketData::isEmpty() const {
+  return bars_.empty();
 }
 
-const Bar& MarketData::getFirst() const {
-  if (isEmpty()) {
-    throw std::out_of_range("No bars available in MarketData::getFirst");
-  }
-  return bars_.front();
+void MarketData::clear() {
+  bars_.clear();
+  currentIter_ = bars_.cend();
 }
 
-const Bar& MarketData::getLast() const {
-  if (isEmpty()) {
-    throw std::out_of_range("No bars available in MarketData::getLast");
-  }
-  return bars_.back();
+// STL-style iterator methods
+MarketData::iterator MarketData::begin() {
+  return bars_.begin();
+}
+
+MarketData::iterator MarketData::end() {
+  return bars_.end();
+}
+
+MarketData::const_iterator MarketData::begin() const {
+  return bars_.begin();
+}
+
+MarketData::const_iterator MarketData::end() const {
+  return bars_.end();
+}
+
+MarketData::const_iterator MarketData::cbegin() const {
+  return bars_.cbegin();
+}
+
+MarketData::const_iterator MarketData::cend() const {
+  return bars_.cend();
+}
+
+bool MarketData::isValidIterator(const_iterator iter) const {
+  return iter >= bars_.cbegin() && iter < bars_.cend();
 }
 
 const Bar& MarketData::current() const {
   if (isEmpty()) {
     throw std::out_of_range("No bars available in MarketData::current");
   }
-  if (!isValidIndex(currentIndex_)) {
-    throw std::out_of_range("currentIndex_ out of range in MarketData::current");
+  if (!isValidIterator(currentIter_)) {
+    throw std::out_of_range("currentIter_ out of range in MarketData::current");
   }
-  return bars_[currentIndex_];
+  return *currentIter_;
 }
 
 bool MarketData::next() {
-  if (isValidIndex(currentIndex_ + 1)) {
-    currentIndex_++;
+  if (isValidIterator(currentIter_) && (currentIter_ + 1) != bars_.cend()) {
+    currentIter_++;
     return true;
   }
   return false;
 }
 
 bool MarketData::prev() {
-  if (isValidIndex(currentIndex_ - 1)) {
-    currentIndex_--;
+  if (isValidIterator(currentIter_) && currentIter_ != bars_.cbegin()) {
+    currentIter_--;
     return true;
   }
   return false;
 }
 
 bool MarketData::reset() {
-  if (isValidIndex(currentIndex_)) {
-    currentIndex_ = 0;
+  if (!isEmpty()) {
+    currentIter_ = bars_.cbegin();
     return true;
   }
   return false;
 }
 
-bool MarketData::setCurrentIndex(int index) {
-  if (isValidIndex(index)) {
-    currentIndex_ = index;
+bool MarketData::findByTimestamp(const_iterator &itr, const std::string& timestamp) const {
+  if (isEmpty()) {
+    return false;
+  }
+
+  const_iterator saveIter = itr;
+  itr = std::find_if(bars_.cbegin(), bars_.cend(),
+                     [&timestamp](const Bar& bar) { return bar.timestamp == timestamp; });
+
+  if (isValidIterator(itr)) {
+    Log::info("Found bar with timestamp: " + timestamp);
     return true;
   }
+  itr = saveIter; 
   return false;
 }
 
-bool MarketData::isLast() const {
-  return !isValidIndex(currentIndex_ + 1);
-}
-
-std::vector<Bar> MarketData::getRange(int start, int end) const {
-  if (!isValidIndex(start) || !isValidIndex(end) || start > end) {
-    return {};
+bool MarketData::seek(const_iterator &itr, int offset, const SeekMode &mode) {
+  if (isEmpty()) {
+    return false;
   }
-  return std::vector<Bar>(bars_.begin() + start, bars_.begin() + end + 1);
-}
 
-int MarketData::findIndexByTimestamp(const std::string& timestamp) const {
-  for (size_t i = 0; i < bars_.size(); ++i) {
-    if (bars_[i].timestamp == timestamp) {
-      return static_cast<int>(i);
-    }
+  const_iterator saveIter = itr;
+  switch (mode) {
+    case SeekMode::CURRENT:
+      itr = bars_.cbegin() + offset;
+      break;
+    case SeekMode::BEGIN:
+      itr = bars_.cbegin() + offset;
+      break;
+    case SeekMode::END:
+      itr = bars_.cend() + offset - 1;
+      break;
   }
-  return -1;
-}
 
-std::vector<Bar> MarketData::getBetweenTimestamps(const std::string& start, const std::string& end) const {
-  if (isValidIndex(findIndexByTimestamp(start)) &&
-      isValidIndex(findIndexByTimestamp(end))) {
-    int startIndex = findIndexByTimestamp(start);
-    int endIndex = findIndexByTimestamp(end);
-    return getRange(startIndex, endIndex);
+  // Validate the iterator after seeking
+  if (!isValidIterator(itr)) {
+    itr = saveIter; 
   }
-  return {};
-}
-
-bool MarketData::move(int offset) {
-  int newIndex = currentIndex_ + offset;
-  if (isValidIndex(newIndex)) {
-    currentIndex_ = newIndex;
-    return true;
-  }
-  return false;
+  Log::info("Seeked iterator to position: " + std::to_string(std::distance(bars_.cbegin(), itr)));
+  return true;
 }

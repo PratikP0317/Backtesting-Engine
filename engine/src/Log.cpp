@@ -6,14 +6,17 @@
 std::ofstream Log::log_file_;
 bool Log::file_logging_enabled_ = false;
 std::mutex Log::log_mutex_;
+bool Log::verbose_ = false;
 
-void Log::init(const std::string& filename) {
+void Log::init(const std::string& filename, bool verbose) {
   std::lock_guard<std::mutex> lock(log_mutex_);
   std::filesystem::create_directory("logs");
   std::string full_path = "logs/" + filename;
 
   log_file_.open(full_path, std::ios::out | std::ios::app);
   file_logging_enabled_ = log_file_.is_open();
+  verbose_ = verbose;
+  
 
   if (!file_logging_enabled_) {
     std::cerr << "[error] Failed to open log file: " << full_path << std::endl;
@@ -44,7 +47,8 @@ void Log::debug(const std::string& msg) {
 void Log::info(const std::string& msg) {
   std::lock_guard<std::mutex> lock(log_mutex_);
   std::string formatted = "[Info] " + timestamp() + " - " + msg;
-  std::cout << formatted << std::endl;
+  if (verbose_)
+    std::cout << formatted << std::endl;
   if (file_logging_enabled_) log_file_ << formatted << std::endl;
 }
 

@@ -11,6 +11,13 @@ public:
   using iterator = std::vector<Bar>::iterator;
   using const_iterator = std::vector<Bar>::const_iterator;
 
+  enum class SeekMode{
+    CURRENT,
+    BEGIN,
+    END 
+  };
+
+  MarketData();
   MarketData(const std::string &csvFilePath);
 
   // Load CSV into internal bar list
@@ -19,8 +26,8 @@ public:
   int size() const;
   bool isEmpty() const;
   void clear();
-  
-  // STL-style iterator access
+
+    // STL-style iterator access
   iterator begin();
   iterator end();
   const_iterator begin() const;
@@ -28,29 +35,18 @@ public:
   const_iterator cbegin() const;
   const_iterator cend() const;
 
-  const Bar &get(int index) const;
-  int getCurrentIndex() const;
-  const Bar &getFirst() const;
-  const Bar &getLast() const;
-  const std::vector<Bar> &getAll() const;
-
   const Bar &current() const;
   bool next();
   bool prev();
   bool reset();
-  bool setCurrentIndex(int index);
 
-  bool isLast() const;
+  bool findByTimestamp(const_iterator &itr, const std::string& timestamp) const;
+  bool seek(const_iterator &itr, int offset, const SeekMode &mode);
 
-  std::vector<Bar> getRange(int start, int end) const;
-  int findIndexByTimestamp(const std::string& timestamp) const;
-  std::vector<Bar> getBetweenTimestamps(const std::string& start, const std::string& end) const;
 
-  bool move(int offset);
+  bool isValidIterator(const_iterator iter) const;
 
 private:
   std::vector<Bar> bars_;
   const_iterator currentIter_;
-
-  bool isValidIndex(int index) const;
 };
