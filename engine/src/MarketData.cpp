@@ -47,7 +47,7 @@ bool MarketData::loadFromCSV(const std::string &filepath) {
       //           std::to_string(bar.close) + "," + std::to_string(bar.volume) + "," + 
       //           std::to_string(bar.tradeCount) + "," + std::to_string(bar.vwap));
     } catch (const std::exception& e) {
-      Log::warn("Failed to parse line " + std::to_string(lineNumber) + ": " + e.what());
+      Log::error("Failed to parse line " + std::to_string(lineNumber) + ": " + e.what());
       return false;
     }
     bars_.push_back(bar);

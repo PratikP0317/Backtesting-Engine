@@ -14,9 +14,9 @@ public:
 private:
   MarketData data_;
   double cash_;
-  double position_;   
+  long position_;   
   double entryPrice_;
   bool inPosition_;
 
-  void onBar(const Bar& bar);  
+  void onBar();  
 };

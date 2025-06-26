@@ -1,0 +1,11 @@
+[Info] 2025-06-23 05:40:07 - Attempting to load CSV: data/spy_minute.csv
+[Info] 2025-06-23 05:40:07 - Starting to parse CSV file: data/spy_minute.csv
+[Info] 2025-06-23 05:40:07 - symbol,timestamp,open,high,low,close,volume,tradeCount,vwap
+[Info] 2025-06-23 05:40:07 - Successfully loaded 1176 bars from data/spy_minute.csv
+[Info] 2025-06-23 05:40:07 - Starting backtest...
+[Info] 2025-06-23 05:40:07 - BUY at 599.310000 on 2025-06-13 13:30:00+00:00
+[Info] 2025-06-23 05:40:07 - Backtest completed.
+[Info] 2025-06-23 05:40:07 - Backtest Summary:
+[Info] 2025-06-23 05:40:07 - Final Cash: 514.540000
+[Info] 2025-06-23 05:40:07 - Final Position: 166
+[Info] 2025-06-23 05:40:07 - Entry Price: 599.310000

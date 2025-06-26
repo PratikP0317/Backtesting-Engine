@@ -7,18 +7,32 @@
 
 class MarketData {
 public:
+  // Iterator type aliases for STL compatibility
+  using iterator = std::vector<Bar>::iterator;
+  using const_iterator = std::vector<Bar>::const_iterator;
+
+  MarketData(const std::string &csvFilePath);
+
   // Load CSV into internal bar list
   bool loadFromCSV(const std::string &filepath);
 
-  int size() const { return static_cast<int>(bars_.size());}
-  bool isEmpty() const { return bars_.empty(); }
-  void clear() { bars_.clear();  currentIndex_ = 0; }
+  int size() const;
+  bool isEmpty() const;
+  void clear();
+  
+  // STL-style iterator access
+  iterator begin();
+  iterator end();
+  const_iterator begin() const;
+  const_iterator end() const;
+  const_iterator cbegin() const;
+  const_iterator cend() const;
 
   const Bar &get(int index) const;
-  int getCurrentIndex() const { return currentIndex_; }
+  int getCurrentIndex() const;
   const Bar &getFirst() const;
   const Bar &getLast() const;
-  const std::vector<Bar> &getAll() const {return bars_;}
+  const std::vector<Bar> &getAll() const;
 
   const Bar &current() const;
   bool next();
@@ -36,7 +50,7 @@ public:
 
 private:
   std::vector<Bar> bars_;
-  int currentIndex_ = 0;
+  const_iterator currentIter_;
 
   bool isValidIndex(int index) const;
 };
